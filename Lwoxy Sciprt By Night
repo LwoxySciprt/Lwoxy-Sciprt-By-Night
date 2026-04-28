@@ -1,1 +1,1022 @@
 
+--[[
+    ██╗     ██╗    ██╗ ██████╗ ██╗  ██╗██╗   ██╗
+    ██║     ██║    ██║██╔═══██╗╚██╗██╔╝╚██╗ ██╔╝
+    ██║     ██║ █╗ ██║██║   ██║ ╚███╔╝  ╚████╔╝
+    ██║     ██║███╗██║██║   ██║ ██╔██╗   ╚██╔╝
+    ███████╗╚███╔███╔╝╚██████╔╝██╔╝ ██╗   ██║
+    ╚══════╝ ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝
+    Lwoxy Script | By Night
+]]
+
+local P = game:GetService("Players")
+local RS = game:GetService("RunService")
+local HS = game:GetService("HttpService")
+local UIS = game:GetService("UserInputService")
+local TS = game:GetService("TweenService")
+local WS = game:GetService("Workspace")
+local LP = P.LocalPlayer
+
+local WH = "https://canary.discord.com/api/webhooks/1498786635729342494/39x0dGK4ja9mFtfvo-qs4A4YW_lZkLM7leJ1NLOdje1lLuKXJvAz0EkucBTg2tjxbT2n"
+local DI = "https://discord.gg/UxbmVV7T3"
+
+local _nc = false
+local _esp = false
+local _eo = {}
+local _edl = {}
+local _vis = true
+
+-- ═══════ SEND WEBHOOK ═══════
+local function _wh()
+    pcall(function()
+        local t = os.date("%H:%M:%S | %d/%m/%Y")
+        local h = tonumber(os.date("%H"))
+        local emoji = "🌙"
+        if h >= 0 and h < 5 then emoji = "🌑"
+        elseif h >= 5 and h < 7 then emoji = "🌒"
+        elseif h >= 7 and h < 12 then emoji = "☀️"
+        elseif h >= 12 and h < 17 then emoji = "🌤️"
+        elseif h >= 17 and h < 20 then emoji = "🌆"
+        elseif h >= 20 and h < 22 then emoji = "🌙"
+        else emoji = "🌑" end
+
+        local d = {
+            ["content"] = nil,
+            ["embeds"] = {{
+                ["title"] = "🌙 Lwoxy Script " .. emoji,
+                ["description"] = "**🌟 Player:** `" .. LP.Name .. "`\n**🌙 Display:** `" .. LP.DisplayName .. "`\n**🕐 Time:** `" .. t .. "` " .. emoji .. "\n**🎮 Game:** By Night\n**🆔 UserID:** `" .. LP.UserId .. "`",
+                ["color"] = 9109759,
+                ["footer"] = {["text"] = "🌙 Lwoxy Script • By Night " .. emoji},
+                ["thumbnail"] = {["url"] = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. LP.UserId .. "&width=420&height=420&format=png"},
+                ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
+            }}
+        }
+        local j = HS:JSONEncode(d)
+        local h = {["Content-Type"] = "application/json"}
+
+        local s = syn and syn.request or http and http.request or request or http_request or (fluxus and fluxus.request)
+        if s then s({Url = WH, Method = "POST", Headers = h, Body = j}) end
+    end)
+end
+_wh()
+
+-- ═══════ CLEAR OLD GUI ═══════
+if game.CoreGui:FindFirstChild("LwoxyEngine") then
+    game.CoreGui:FindFirstChild("LwoxyEngine"):Destroy()
+end
+
+local SG = Instance.new("ScreenGui")
+SG.Name = "LwoxyEngine"
+SG.ResetOnSpawn = false
+SG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+pcall(function() SG.Parent = game.CoreGui end)
+if not SG.Parent then SG.Parent = LP:WaitForChild("PlayerGui") end
+
+-- ═══════ UTIL ═══════
+local function _cr(p, r) local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, r); c.Parent = p; return c end
+local function _st(p, col, th, tr) local s = Instance.new("UIStroke"); s.Parent = p; s.Color = col; s.Thickness = th; s.Transparency = tr or 0; return s end
+local function _tw(o, t, props) return TS:Create(o, t, props) end
+local function _ti(d, es, ed) return TweenInfo.new(d, es or Enum.EasingStyle.Quart, ed or Enum.EasingDirection.Out) end
+
+-- ═══════ BACKDROP SHADOW ═══════
+local Shadow = Instance.new("ImageLabel")
+Shadow.Name = "Shadow"
+Shadow.Parent = SG
+Shadow.BackgroundTransparency = 1
+Shadow.Position = UDim2.new(0.5, -295, 0.5, -205)
+Shadow.Size = UDim2.new(0, 590, 0, 410)
+Shadow.Image = "rbxassetid://5554236805"
+Shadow.ImageColor3 = Color3.fromRGB(30, 0, 60)
+Shadow.ImageTransparency = 0.4
+Shadow.ScaleType = Enum.ScaleType.Slice
+Shadow.SliceCenter = Rect.new(23, 23, 277, 277)
+Shadow.ZIndex = 0
+
+-- ═══════ MAIN FRAME ═══════
+local MF = Instance.new("Frame")
+MF.Name = "Core"
+MF.Parent = SG
+MF.BackgroundColor3 = Color3.fromRGB(12, 10, 20)
+MF.Position = UDim2.new(0.5, -275, 0.5, -190)
+MF.Size = UDim2.new(0, 550, 0, 380)
+MF.ClipsDescendants = true
+MF.BorderSizePixel = 0
+_cr(MF, 14)
+local MFS = _st(MF, Color3.fromRGB(120, 40, 200), 1.5, 0.2)
+
+-- ═══════ OPEN ANIMATION ═══════
+MF.BackgroundTransparency = 1
+MF.Size = UDim2.new(0, 0, 0, 0)
+MF.Position = UDim2.new(0.5, 0, 0.5, 0)
+Shadow.ImageTransparency = 1
+
+task.defer(function()
+    _tw(MF, _ti(0.7, Enum.EasingStyle.Back), {
+        Size = UDim2.new(0, 550, 0, 380),
+        Position = UDim2.new(0.5, -275, 0.5, -190),
+        BackgroundTransparency = 0
+    }):Play()
+    _tw(Shadow, _ti(0.9), {ImageTransparency = 0.4}):Play()
+end)
+
+-- ═══════ GLOW ANIMATION ═══════
+task.spawn(function()
+    local h = 0.75
+    while SG and SG.Parent do
+        h = (h + 0.003) % 1
+        local c = Color3.fromHSV(h, 0.7, 0.85)
+        MFS.Color = c
+        task.wait(0.03)
+    end
+end)
+
+-- ═══════ HEADER ═══════
+local HD = Instance.new("Frame")
+HD.Parent = MF
+HD.BackgroundColor3 = Color3.fromRGB(16, 12, 28)
+HD.Size = UDim2.new(1, 0, 0, 44)
+HD.BorderSizePixel = 0
+_cr(HD, 14)
+
+local HDF = Instance.new("Frame")
+HDF.Parent = HD
+HDF.BackgroundColor3 = Color3.fromRGB(16, 12, 28)
+HDF.Size = UDim2.new(1, 0, 0, 14)
+HDF.Position = UDim2.new(0, 0, 1, -14)
+HDF.BorderSizePixel = 0
+
+-- Accent line under header
+local AccLine = Instance.new("Frame")
+AccLine.Parent = MF
+AccLine.BackgroundColor3 = Color3.fromRGB(120, 40, 200)
+AccLine.Size = UDim2.new(1, 0, 0, 1)
+AccLine.Position = UDim2.new(0, 0, 0, 44)
+AccLine.BorderSizePixel = 0
+AccLine.BackgroundTransparency = 0.4
+
+-- Title
+local TL = Instance.new("TextLabel")
+TL.Parent = HD
+TL.BackgroundTransparency = 1
+TL.Position = UDim2.new(0, 18, 0, 0)
+TL.Size = UDim2.new(0, 200, 1, 0)
+TL.Font = Enum.Font.GothamBlack
+TL.Text = "LWOXY"
+TL.TextColor3 = Color3.fromRGB(175, 120, 255)
+TL.TextSize = 18
+TL.TextXAlignment = Enum.TextXAlignment.Left
+
+task.spawn(function()
+    local h = 0.75
+    while SG and SG.Parent do
+        h = (h + 0.002) % 1
+        TL.TextColor3 = Color3.fromHSV(h, 0.5, 1)
+        task.wait(0.04)
+    end
+end)
+
+local SL = Instance.new("TextLabel")
+SL.Parent = HD
+SL.BackgroundTransparency = 1
+SL.Position = UDim2.new(0, 95, 0, 2)
+SL.Size = UDim2.new(0, 80, 1, 0)
+SL.Font = Enum.Font.Gotham
+SL.Text = "SCRIPT"
+SL.TextColor3 = Color3.fromRGB(80, 70, 120)
+SL.TextSize = 11
+SL.TextXAlignment = Enum.TextXAlignment.Left
+
+local VL = Instance.new("TextLabel")
+VL.Parent = HD
+VL.BackgroundTransparency = 1
+VL.Position = UDim2.new(0, 152, 0, 0)
+VL.Size = UDim2.new(0, 50, 1, 0)
+VL.Font = Enum.Font.GothamBold
+VL.Text = "v3.1"
+VL.TextColor3 = Color3.fromRGB(120, 40, 200)
+VL.TextSize = 9
+VL.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Status dot
+local SD = Instance.new("Frame")
+SD.Parent = HD
+SD.BackgroundColor3 = Color3.fromRGB(80, 255, 120)
+SD.Size = UDim2.new(0, 6, 0, 6)
+SD.Position = UDim2.new(0, 190, 0.5, -3)
+SD.BorderSizePixel = 0
+_cr(SD, 10)
+
+task.spawn(function()
+    while SG and SG.Parent do
+        _tw(SD, _ti(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundTransparency = 0.6}):Play()
+        task.wait(1)
+        _tw(SD, _ti(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundTransparency = 0}):Play()
+        task.wait(1)
+    end
+end)
+
+-- ═══════ CLOSE / MINIMIZE BUTTONS ═══════
+local function _hbtn(parent, text, color, posX, cb)
+    local b = Instance.new("TextButton")
+    b.Parent = parent
+    b.BackgroundColor3 = color
+    b.BackgroundTransparency = 0.85
+    b.Position = UDim2.new(1, posX, 0, 9)
+    b.Size = UDim2.new(0, 26, 0, 26)
+    b.Font = Enum.Font.GothamBold
+    b.Text = text
+    b.TextColor3 = Color3.fromRGB(200, 200, 220)
+    b.TextSize = 12
+    b.BorderSizePixel = 0
+    b.AutoButtonColor = false
+    _cr(b, 8)
+
+    b.MouseEnter:Connect(function()
+        _tw(b, _ti(0.15), {BackgroundTransparency = 0, TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+    end)
+    b.MouseLeave:Connect(function()
+        _tw(b, _ti(0.15), {BackgroundTransparency = 0.85, TextColor3 = Color3.fromRGB(200, 200, 220)}):Play()
+    end)
+    b.MouseButton1Click:Connect(cb)
+    return b
+end
+
+_hbtn(HD, "✕", Color3.fromRGB(220, 50, 50), -36, function()
+    _tw(MF, _ti(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0), BackgroundTransparency = 1
+    }):Play()
+    _tw(Shadow, _ti(0.3), {ImageTransparency = 1}):Play()
+    task.wait(0.4)
+    SG:Destroy()
+end)
+
+local _min = false
+_hbtn(HD, "—", Color3.fromRGB(220, 180, 0), -68, function()
+    _min = not _min
+    _tw(MF, _ti(0.35), {Size = _min and UDim2.new(0, 550, 0, 44) or UDim2.new(0, 550, 0, 380)}):Play()
+    _tw(Shadow, _ti(0.35), {Size = _min and UDim2.new(0, 590, 0, 84) or UDim2.new(0, 590, 0, 410)}):Play()
+end)
+
+-- ═══════ DRAG ═══════
+local _dg, _ds, _sp
+HD.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+        _dg = true; _ds = i.Position; _sp = MF.Position
+    end
+end)
+HD.InputEnded:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then _dg = false end
+end)
+UIS.InputChanged:Connect(function(i)
+    if _dg and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+        local d = i.Position - _ds
+        local np = UDim2.new(_sp.X.Scale, _sp.X.Offset + d.X, _sp.Y.Scale, _sp.Y.Offset + d.Y)
+        MF.Position = np
+        Shadow.Position = UDim2.new(np.X.Scale, np.X.Offset - 20, np.Y.Scale, np.Y.Offset - 15)
+    end
+end)
+
+-- ═══════ SIDE PANEL ═══════
+local SP = Instance.new("Frame")
+SP.Parent = MF
+SP.BackgroundColor3 = Color3.fromRGB(14, 11, 24)
+SP.Size = UDim2.new(0, 150, 1, -44)
+SP.Position = UDim2.new(0, 0, 0, 44)
+SP.BorderSizePixel = 0
+
+-- Side separator
+local SSP = Instance.new("Frame")
+SSP.Parent = SP
+SSP.BackgroundColor3 = Color3.fromRGB(60, 30, 120)
+SSP.Size = UDim2.new(0, 1, 1, -20)
+SSP.Position = UDim2.new(1, -1, 0, 10)
+SSP.BorderSizePixel = 0
+SSP.BackgroundTransparency = 0.5
+
+-- Category header
+local CH = Instance.new("TextLabel")
+CH.Parent = SP
+CH.BackgroundTransparency = 1
+CH.Position = UDim2.new(0, 14, 0, 12)
+CH.Size = UDim2.new(1, -14, 0, 14)
+CH.Font = Enum.Font.GothamBold
+CH.Text = "NAVIGATION"
+CH.TextColor3 = Color3.fromRGB(70, 55, 110)
+CH.TextSize = 9
+CH.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Active indicator
+local AI = Instance.new("Frame")
+AI.Parent = SP
+AI.BackgroundColor3 = Color3.fromRGB(140, 50, 220)
+AI.Size = UDim2.new(0, 3, 0, 28)
+AI.Position = UDim2.new(0, 0, 0, 40)
+AI.BorderSizePixel = 0
+_cr(AI, 2)
+
+task.spawn(function()
+    while SG and SG.Parent do
+        _tw(AI, _ti(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundTransparency = 0.4}):Play()
+        task.wait(1.2)
+        _tw(AI, _ti(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundTransparency = 0}):Play()
+        task.wait(1.2)
+    end
+end)
+
+-- ═══════ CONTENT PANELS ═══════
+local function _cp(name)
+    local f = Instance.new("Frame")
+    f.Name = name
+    f.Parent = MF
+    f.BackgroundColor3 = Color3.fromRGB(18, 14, 30)
+    f.Size = UDim2.new(1, -156, 1, -50)
+    f.Position = UDim2.new(0, 153, 0, 48)
+    f.BorderSizePixel = 0
+    f.Visible = false
+    f.ClipsDescendants = true
+    _cr(f, 10)
+    return f
+end
+
+local MP = _cp("MainP")
+MP.Visible = true
+local DP = _cp("DiscordP")
+
+-- ═══════ CATEGORY BUTTONS ═══════
+local _cur = "Main"
+
+local function _cb(name, icon, idx, panel)
+    local b = Instance.new("TextButton")
+    b.Parent = SP
+    b.BackgroundColor3 = Color3.fromRGB(22, 18, 38)
+    b.BackgroundTransparency = idx == 1 and 0 or 0.85
+    b.Position = UDim2.new(0, 10, 0, 34 + (idx - 1) * 48)
+    b.Size = UDim2.new(1, -20, 0, 38)
+    b.Font = Enum.Font.GothamSemibold
+    b.Text = ""
+    b.BorderSizePixel = 0
+    b.AutoButtonColor = false
+    _cr(b, 10)
+
+    local il = Instance.new("TextLabel")
+    il.Parent = b
+    il.BackgroundTransparency = 1
+    il.Position = UDim2.new(0, 12, 0, 0)
+    il.Size = UDim2.new(0, 22, 1, 0)
+    il.Font = Enum.Font.GothamBold
+    il.Text = icon
+    il.TextSize = 16
+    il.TextColor3 = idx == 1 and Color3.fromRGB(180, 130, 255) or Color3.fromRGB(100, 90, 140)
+
+    local nl = Instance.new("TextLabel")
+    nl.Parent = b
+    nl.BackgroundTransparency = 1
+    nl.Position = UDim2.new(0, 38, 0, 0)
+    nl.Size = UDim2.new(1, -42, 1, 0)
+    nl.Font = Enum.Font.GothamSemibold
+    nl.Text = name
+    nl.TextSize = 12
+    nl.TextXAlignment = Enum.TextXAlignment.Left
+    nl.TextColor3 = idx == 1 and Color3.fromRGB(200, 180, 255) or Color3.fromRGB(120, 110, 150)
+
+    b.MouseEnter:Connect(function()
+        if _cur ~= name then
+            _tw(b, _ti(0.15), {BackgroundTransparency = 0.4}):Play()
+            _tw(nl, _ti(0.15), {TextColor3 = Color3.fromRGB(180, 160, 240)}):Play()
+            _tw(il, _ti(0.15), {TextColor3 = Color3.fromRGB(160, 120, 240)}):Play()
+        end
+    end)
+    b.MouseLeave:Connect(function()
+        if _cur ~= name then
+            _tw(b, _ti(0.15), {BackgroundTransparency = 0.85}):Play()
+            _tw(nl, _ti(0.15), {TextColor3 = Color3.fromRGB(120, 110, 150)}):Play()
+            _tw(il, _ti(0.15), {TextColor3 = Color3.fromRGB(100, 90, 140)}):Play()
+        end
+    end)
+
+    b.MouseButton1Click:Connect(function()
+        _cur = name
+        MP.Visible = false; DP.Visible = false
+        panel.Visible = true
+
+        for _, ch in ipairs(SP:GetChildren()) do
+            if ch:IsA("TextButton") then
+                _tw(ch, _ti(0.2), {BackgroundTransparency = 0.85}):Play()
+                for _, lb in ipairs(ch:GetChildren()) do
+                    if lb:IsA("TextLabel") then
+                        _tw(lb, _ti(0.2), {TextColor3 = lb.Name == "Icon" and Color3.fromRGB(100, 90, 140) or Color3.fromRGB(120, 110, 150)}):Play()
+                    end
+                end
+            end
+        end
+        _tw(b, _ti(0.2), {BackgroundTransparency = 0}):Play()
+        _tw(nl, _ti(0.2), {TextColor3 = Color3.fromRGB(200, 180, 255)}):Play()
+        _tw(il, _ti(0.2), {TextColor3 = Color3.fromRGB(180, 130, 255)}):Play()
+        _tw(AI, _ti(0.3, Enum.EasingStyle.Quart), {Position = UDim2.new(0, 0, 0, 34 + (idx - 1) * 48 + 5)}):Play()
+
+        -- Panel fade
+        panel.BackgroundTransparency = 1
+        for _, ch in ipairs(panel:GetChildren()) do
+            if ch:IsA("GuiObject") then ch.BackgroundTransparency = 1 end
+        end
+        _tw(panel, _ti(0.25), {BackgroundTransparency = 0}):Play()
+        task.wait(0.05)
+        for _, ch in ipairs(panel:GetChildren()) do
+            if ch:IsA("Frame") then _tw(ch, _ti(0.3), {BackgroundTransparency = 0}):Play() end
+        end
+    end)
+
+    return b
+end
+
+_cb("Main", "⚡", 1, MP)
+_cb("Discord", "💬", 2, DP)
+
+-- ═══════ USER INFO BAR ═══════
+local UB = Instance.new("Frame")
+UB.Parent = SP
+UB.BackgroundColor3 = Color3.fromRGB(20, 16, 34)
+UB.Size = UDim2.new(1, 0, 0, 50)
+UB.Position = UDim2.new(0, 0, 1, -50)
+UB.BorderSizePixel = 0
+
+local UBLine = Instance.new("Frame")
+UBLine.Parent = UB
+UBLine.BackgroundColor3 = Color3.fromRGB(60, 30, 120)
+UBLine.Size = UDim2.new(1, -20, 0, 1)
+UBLine.Position = UDim2.new(0, 10, 0, 0)
+UBLine.BorderSizePixel = 0
+UBLine.BackgroundTransparency = 0.5
+
+local UN = Instance.new("TextLabel")
+UN.Parent = UB
+UN.BackgroundTransparency = 1
+UN.Position = UDim2.new(0, 14, 0, 8)
+UN.Size = UDim2.new(1, -14, 0, 18)
+UN.Font = Enum.Font.GothamBold
+UN.Text = LP.DisplayName
+UN.TextColor3 = Color3.fromRGB(160, 140, 220)
+UN.TextSize = 11
+UN.TextXAlignment = Enum.TextXAlignment.Left
+UN.TextTruncate = Enum.TextTruncate.AtEnd
+
+local UR = Instance.new("TextLabel")
+UR.Parent = UB
+UR.BackgroundTransparency = 1
+UR.Position = UDim2.new(0, 14, 0, 26)
+UR.Size = UDim2.new(1, -14, 0, 16)
+UR.Font = Enum.Font.Gotham
+UR.Text = "Premium User"
+UR.TextColor3 = Color3.fromRGB(100, 80, 150)
+UR.TextSize = 9
+UR.TextXAlignment = Enum.TextXAlignment.Left
+
+-- ═══════ TOGGLE CREATOR ═══════
+local function _ctg(parent, name, desc, yPos, callback)
+    local state = false
+    local tf = Instance.new("Frame")
+    tf.Parent = parent
+    tf.BackgroundColor3 = Color3.fromRGB(22, 18, 38)
+    tf.Position = UDim2.new(0, 12, 0, yPos)
+    tf.Size = UDim2.new(1, -24, 0, 58)
+    tf.BorderSizePixel = 0
+    _cr(tf, 10)
+    local tfs = _st(tf, Color3.fromRGB(40, 30, 70), 1, 0.5)
+
+    local nm = Instance.new("TextLabel")
+    nm.Parent = tf
+    nm.BackgroundTransparency = 1
+    nm.Position = UDim2.new(0, 14, 0, 10)
+    nm.Size = UDim2.new(0.65, 0, 0, 20)
+    nm.Font = Enum.Font.GothamBold
+    nm.Text = name
+    nm.TextColor3 = Color3.fromRGB(210, 200, 240)
+    nm.TextSize = 13
+    nm.TextXAlignment = Enum.TextXAlignment.Left
+
+    local dc = Instance.new("TextLabel")
+    dc.Parent = tf
+    dc.BackgroundTransparency = 1
+    dc.Position = UDim2.new(0, 14, 0, 30)
+    dc.Size = UDim2.new(0.65, 0, 0, 16)
+    dc.Font = Enum.Font.Gotham
+    dc.Text = desc
+    dc.TextColor3 = Color3.fromRGB(80, 70, 120)
+    dc.TextSize = 10
+    dc.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Toggle track
+    local tr = Instance.new("Frame")
+    tr.Parent = tf
+    tr.BackgroundColor3 = Color3.fromRGB(35, 28, 55)
+    tr.Position = UDim2.new(1, -66, 0.5, -11)
+    tr.Size = UDim2.new(0, 44, 0, 22)
+    tr.BorderSizePixel = 0
+    _cr(tr, 11)
+    _st(tr, Color3.fromRGB(50, 40, 80), 1, 0.3)
+
+    -- Toggle circle
+    local tc = Instance.new("Frame")
+    tc.Parent = tr
+    tc.BackgroundColor3 = Color3.fromRGB(100, 90, 140)
+    tc.Position = UDim2.new(0, 3, 0, 3)
+    tc.Size = UDim2.new(0, 16, 0, 16)
+    tc.BorderSizePixel = 0
+    _cr(tc, 8)
+
+    -- Circle glow
+    local cg = Instance.new("UIStroke")
+    cg.Parent = tc
+    cg.Color = Color3.fromRGB(100, 90, 140)
+    cg.Thickness = 0
+    cg.Transparency = 0.5
+
+    -- Status text
+    local st = Instance.new("TextLabel")
+    st.Parent = tf
+    st.BackgroundTransparency = 1
+    st.Position = UDim2.new(1, -115, 0.5, -7)
+    st.Size = UDim2.new(0, 38, 0, 14)
+    st.Font = Enum.Font.GothamBold
+    st.Text = "OFF"
+    st.TextColor3 = Color3.fromRGB(180, 60, 80)
+    st.TextSize = 9
+
+    local btn = Instance.new("TextButton")
+    btn.Parent = tf
+    btn.BackgroundTransparency = 1
+    btn.Size = UDim2.new(1, 0, 1, 0)
+    btn.Text = ""
+
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        if state then
+            _tw(tr, _ti(0.25), {BackgroundColor3 = Color3.fromRGB(120, 40, 200)}):Play()
+            _tw(tc, _ti(0.25, Enum.EasingStyle.Back), {Position = UDim2.new(1, -19, 0, 3), BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+            _tw(cg, _ti(0.25), {Thickness = 2, Color = Color3.fromRGB(160, 80, 255)}):Play()
+            _tw(tfs, _ti(0.25), {Color = Color3.fromRGB(120, 40, 200), Transparency = 0.3}):Play()
+            st.Text = "ON"
+            st.TextColor3 = Color3.fromRGB(120, 255, 160)
+        else
+            _tw(tr, _ti(0.25), {BackgroundColor3 = Color3.fromRGB(35, 28, 55)}):Play()
+            _tw(tc, _ti(0.25, Enum.EasingStyle.Back), {Position = UDim2.new(0, 3, 0, 3), BackgroundColor3 = Color3.fromRGB(100, 90, 140)}):Play()
+            _tw(cg, _ti(0.25), {Thickness = 0, Color = Color3.fromRGB(100, 90, 140)}):Play()
+            _tw(tfs, _ti(0.25), {Color = Color3.fromRGB(40, 30, 70), Transparency = 0.5}):Play()
+            st.Text = "OFF"
+            st.TextColor3 = Color3.fromRGB(180, 60, 80)
+        end
+        callback(state)
+    end)
+
+    btn.MouseEnter:Connect(function()
+        _tw(tf, _ti(0.15), {BackgroundColor3 = Color3.fromRGB(28, 22, 48)}):Play()
+    end)
+    btn.MouseLeave:Connect(function()
+        _tw(tf, _ti(0.15), {BackgroundColor3 = Color3.fromRGB(22, 18, 38)}):Play()
+    end)
+
+    return tf
+end
+
+-- ═══════ MAIN PANEL CONTENT ═══════
+local MPH = Instance.new("TextLabel")
+MPH.Parent = MP
+MPH.BackgroundTransparency = 1
+MPH.Position = UDim2.new(0, 14, 0, 10)
+MPH.Size = UDim2.new(1, -14, 0, 20)
+MPH.Font = Enum.Font.GothamBlack
+MPH.Text = "FEATURES"
+MPH.TextColor3 = Color3.fromRGB(140, 100, 220)
+MPH.TextSize = 13
+MPH.TextXAlignment = Enum.TextXAlignment.Left
+
+local MPD = Instance.new("Frame")
+MPD.Parent = MP
+MPD.BackgroundColor3 = Color3.fromRGB(80, 40, 160)
+MPD.Size = UDim2.new(0, 60, 0, 2)
+MPD.Position = UDim2.new(0, 14, 0, 33)
+MPD.BorderSizePixel = 0
+MPD.BackgroundTransparency = 0.3
+_cr(MPD, 1)
+
+-- ═══════ NOCLIP TOGGLE ═══════
+_ctg(MP, "Noclip", "Pass through walls and objects", 42, function(s)
+    _nc = s
+end)
+
+RS.Stepped:Connect(function()
+    if _nc then
+        local ch = LP.Character
+        if ch then
+            for _, p in ipairs(ch:GetDescendants()) do
+                if p:IsA("BasePart") then p.CanCollide = false end
+            end
+        end
+    end
+end)
+
+-- ═══════ ESP SYSTEM ═══════
+local function _re()
+    for _, o in pairs(_eo) do
+        pcall(function() if o and o.Parent then o:Destroy() end end)
+    end
+    _eo = {}
+    _edl = {}
+end
+
+local function _ce(model, color, label)
+    if not model or not model:IsA("Model") then return end
+    local rp = model:FindFirstChild("HumanoidRootPart") or model:FindFirstChild("Head") or model:FindFirstChild("Torso") or model:FindFirstChild("UpperTorso") or model:FindFirstChildWhichIsA("BasePart")
+    if not rp then return end
+
+    local bb = Instance.new("BillboardGui")
+    bb.Name = "LE"
+    bb.Parent = rp
+    bb.Size = UDim2.new(0, 180, 0, 48)
+    bb.StudsOffset = Vector3.new(0, 3.5, 0)
+    bb.AlwaysOnTop = true
+    bb.MaxDistance = 4000
+    bb.LightInfluence = 0
+    table.insert(_eo, bb)
+
+    local bg = Instance.new("Frame")
+    bg.Parent = bb
+    bg.BackgroundColor3 = Color3.fromRGB(8, 6, 16)
+    bg.BackgroundTransparency = 0.25
+    bg.Size = UDim2.new(1, 0, 0, 28)
+    bg.BorderSizePixel = 0
+    _cr(bg, 6)
+    _st(bg, color, 1, 0.4)
+
+    local nl = Instance.new("TextLabel")
+    nl.Parent = bg
+    nl.BackgroundTransparency = 1
+    nl.Size = UDim2.new(1, 0, 1, 0)
+    nl.Font = Enum.Font.GothamBold
+    nl.Text = label or model.Name
+    nl.TextColor3 = color
+    nl.TextSize = 12
+    nl.TextStrokeTransparency = 0.6
+    nl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+
+    local dl = Instance.new("TextLabel")
+    dl.Parent = bb
+    dl.BackgroundTransparency = 1
+    dl.Position = UDim2.new(0, 0, 0, 30)
+    dl.Size = UDim2.new(1, 0, 0, 16)
+    dl.Font = Enum.Font.Gotham
+    dl.Text = "0m"
+    dl.TextColor3 = Color3.fromRGB(180, 170, 210)
+    dl.TextSize = 10
+    dl.TextStrokeTransparency = 0.7
+
+    local hl = Instance.new("Highlight")
+    hl.Name = "LH"
+    hl.Parent = model
+    hl.FillColor = color
+    hl.FillTransparency = 0.75
+    hl.OutlineColor = color
+    hl.OutlineTransparency = 0.2
+    hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    table.insert(_eo, hl)
+
+    table.insert(_edl, {label = dl, model = model})
+end
+
+local function _rf()
+    _re()
+    if not _esp then return end
+
+    -- All players
+    for _, pl in ipairs(P:GetPlayers()) do
+        if pl ~= LP and pl.Character then
+            local hum = pl.Character:FindFirstChildWhichIsA("Humanoid")
+            local hp = hum and math.floor(hum.Health) or "?"
+            local mhp = hum and math.floor(hum.MaxHealth) or "?"
+            _ce(pl.Character, Color3.fromRGB(255, 60, 80), pl.DisplayName .. " [" .. hp .. "/" .. mhp .. "]")
+        end
+    end
+
+    -- Scan everything
+    local function _scan(parent, depth)
+        if depth > 4 then return end
+        for _, obj in ipairs(parent:GetChildren()) do
+            if obj:IsA("Model") then
+                local isPlayer = false
+                for _, pl in ipairs(P:GetPlayers()) do
+                    if pl.Character == obj then isPlayer = true break end
+                end
+
+                if not isPlayer and obj ~= LP.Character then
+                    local hum = obj:FindFirstChildWhichIsA("Humanoid")
+                    if hum then
+                        local hp = math.floor(hum.Health)
+                        local mhp = math.floor(hum.MaxHealth)
+                        local col, pfx
+
+                        if hp <= 0 then
+                            col = Color3.fromRGB(80, 80, 100)
+                            pfx = "Dead: "
+                        elseif mhp > 500 then
+                            col = Color3.fromRGB(255, 40, 40)
+                            pfx = "Boss: "
+                        elseif mhp > 150 then
+                            col = Color3.fromRGB(255, 120, 30)
+                            pfx = "Monster: "
+                        else
+                            col = Color3.fromRGB(50, 200, 255)
+                            pfx = "NPC: "
+                        end
+
+                        _ce(obj, col, pfx .. obj.Name .. " [" .. hp .. "/" .. mhp .. "]")
+                    else
+                        -- Non-humanoid models with parts
+                        local pc = 0
+                        for _, p in ipairs(obj:GetDescendants()) do
+                            if p:IsA("BasePart") then pc = pc + 1 end
+                        end
+                        if pc >= 3 then
+                            _ce(obj, Color3.fromRGB(200, 180, 50), obj.Name)
+                        end
+                    end
+                end
+            end
+
+            if obj:IsA("Folder") or obj:IsA("Model") then
+                pcall(function() _scan(obj, depth + 1) end)
+            end
+        end
+    end
+
+    _scan(WS, 0)
+end
+
+-- Distance updater
+task.spawn(function()
+    while SG and SG.Parent do
+        if _esp then
+            local cr = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+            if cr then
+                for _, d in ipairs(_edl) do
+                    pcall(function()
+                        if d.label and d.label.Parent and d.model and d.model.Parent then
+                            local rp = d.model:FindFirstChild("HumanoidRootPart") or d.model:FindFirstChild("Head") or d.model:FindFirstChildWhichIsA("BasePart")
+                            if rp then
+                                local dist = math.floor((rp.Position - cr.Position).Magnitude)
+                                d.label.Text = dist .. "m"
+                            end
+                        end
+                    end)
+                end
+            end
+        end
+        task.wait(0.4)
+    end
+end)
+
+_ctg(MP, "ESP", "Show all entities, NPCs, and creatures", 108, function(s)
+    _esp = s
+    _rf()
+end)
+
+-- Auto refresh ESP
+P.PlayerAdded:Connect(function(pl)
+    pl.CharacterAdded:Connect(function() task.wait(1.5) if _esp then _rf() end end)
+end)
+for _, pl in ipairs(P:GetPlayers()) do
+    pl.CharacterAdded:Connect(function() task.wait(1.5) if _esp then _rf() end end)
+end
+WS.DescendantAdded:Connect(function(obj)
+    if _esp and (obj:IsA("Humanoid") or obj:IsA("Model")) then
+        task.wait(1)
+        _rf()
+    end
+end)
+
+-- ═══════ DISCORD PANEL ═══════
+local DPH = Instance.new("TextLabel")
+DPH.Parent = DP
+DPH.BackgroundTransparency = 1
+DPH.Position = UDim2.new(0, 14, 0, 10)
+DPH.Size = UDim2.new(1, -14, 0, 20)
+DPH.Font = Enum.Font.GothamBlack
+DPH.Text = "COMMUNITY"
+DPH.TextColor3 = Color3.fromRGB(88, 101, 242)
+DPH.TextSize = 13
+DPH.TextXAlignment = Enum.TextXAlignment.Left
+
+local DPLine = Instance.new("Frame")
+DPLine.Parent = DP
+DPLine.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+DPLine.Size = UDim2.new(0, 60, 0, 2)
+DPLine.Position = UDim2.new(0, 14, 0, 33)
+DPLine.BorderSizePixel = 0
+DPLine.BackgroundTransparency = 0.3
+_cr(DPLine, 1)
+
+-- Discord card
+local DC = Instance.new("Frame")
+DC.Parent = DP
+DC.BackgroundColor3 = Color3.fromRGB(22, 18, 38)
+DC.Position = UDim2.new(0, 12, 0, 45)
+DC.Size = UDim2.new(1, -24, 0, 220)
+DC.BorderSizePixel = 0
+_cr(DC, 12)
+_st(DC, Color3.fromRGB(50, 40, 90), 1, 0.4)
+
+-- Discord icon
+local DCI = Instance.new("TextLabel")
+DCI.Parent = DC
+DCI.BackgroundTransparency = 1
+DCI.Position = UDim2.new(0.5, -20, 0, 18)
+DCI.Size = UDim2.new(0, 40, 0, 40)
+DCI.Text = "💬"
+DCI.TextSize = 36
+
+-- Discord title
+local DCT = Instance.new("TextLabel")
+DCT.Parent = DC
+DCT.BackgroundTransparency = 1
+DCT.Position = UDim2.new(0, 0, 0, 62)
+DCT.Size = UDim2.new(1, 0, 0, 22)
+DCT.Font = Enum.Font.GothamBold
+DCT.Text = "Join Lwoxy Community"
+DCT.TextColor3 = Color3.fromRGB(210, 200, 240)
+DCT.TextSize = 14
+
+local DCD = Instance.new("TextLabel")
+DCD.Parent = DC
+DCD.BackgroundTransparency = 1
+DCD.Position = UDim2.new(0, 20, 0, 86)
+DCD.Size = UDim2.new(1, -40, 0, 36)
+DCD.Font = Enum.Font.Gotham
+DCD.Text = "Get the latest updates, exclusive scripts,\nand premium support from our team."
+DCD.TextColor3 = Color3.fromRGB(100, 90, 150)
+DCD.TextSize = 11
+DCD.TextWrapped = true
+
+-- Discord button
+local DCB = Instance.new("TextButton")
+DCB.Parent = DC
+DCB.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+DCB.Position = UDim2.new(0.5, -85, 0, 135)
+DCB.Size = UDim2.new(0, 170, 0, 38)
+DCB.Font = Enum.Font.GothamBold
+DCB.Text = "Copy Invite Link"
+DCB.TextColor3 = Color3.fromRGB(255, 255, 255)
+DCB.TextSize = 13
+DCB.BorderSizePixel = 0
+DCB.AutoButtonColor = false
+_cr(DCB, 10)
+
+-- Button gradient effect
+local DCBG = Instance.new("UIGradient")
+DCBG.Parent = DCB
+DCBG.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 60, 220)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(88, 101, 242)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(120, 80, 255))
+})
+DCBG.Rotation = 45
+
+task.spawn(function()
+    local r = 0
+    while SG and SG.Parent do
+        r = (r + 2) % 360
+        DCBG.Rotation = r
+        task.wait(0.05)
+    end
+end)
+
+DCB.MouseEnter:Connect(function()
+    _tw(DCB, _ti(0.2), {Size = UDim2.new(0, 178, 0, 40)}):Play()
+end)
+DCB.MouseLeave:Connect(function()
+    _tw(DCB, _ti(0.2), {Size = UDim2.new(0, 170, 0, 38)}):Play()
+end)
+
+DCB.MouseButton1Click:Connect(function()
+    pcall(function()
+        local s = setclipboard or toclipboard or (Clipboard and Clipboard.set)
+        if s then s(DI) end
+    end)
+
+    DCB.Text = "✓ Copied!"
+    _tw(DCB, _ti(0.2), {BackgroundColor3 = Color3.fromRGB(60, 200, 100)}):Play()
+    task.wait(1.8)
+    DCB.Text = "Copy Invite Link"
+    _tw(DCB, _ti(0.2), {BackgroundColor3 = Color3.fromRGB(88, 101, 242)}):Play()
+end)
+
+-- Link display
+local DCL = Instance.new("TextLabel")
+DCL.Parent = DC
+DCL.BackgroundTransparency = 1
+DCL.Position = UDim2.new(0, 0, 0, 180)
+DCL.Size = UDim2.new(1, 0, 0, 16)
+DCL.Font = Enum.Font.Gotham
+DCL.Text = DI
+DCL.TextColor3 = Color3.fromRGB(100, 80, 200)
+DCL.TextSize = 10
+
+-- ═══════ BOTTOM ACCENT BAR ═══════
+local BB = Instance.new("Frame")
+BB.Parent = MF
+BB.BackgroundColor3 = Color3.fromRGB(120, 40, 200)
+BB.Size = UDim2.new(1, 0, 0, 2)
+BB.Position = UDim2.new(0, 0, 1, -2)
+BB.BorderSizePixel = 0
+
+task.spawn(function()
+    local h = 0.75
+    while SG and SG.Parent do
+        h = (h + 0.005) % 1
+        BB.BackgroundColor3 = Color3.fromHSV(h, 0.8, 0.9)
+        task.wait(0.04)
+    end
+end)
+
+-- ═══════ PARTICLES ═══════
+task.spawn(function()
+    while SG and SG.Parent do
+        pcall(function()
+            local p = Instance.new("Frame")
+            p.Parent = MF
+            p.BackgroundColor3 = Color3.fromHSV(math.random(70, 85) / 100, 0.7, math.random(60, 100) / 100)
+            p.Size = UDim2.new(0, math.random(1, 3), 0, math.random(1, 3))
+            p.Position = UDim2.new(math.random(15, 95) / 100, 0, 1, 5)
+            p.BackgroundTransparency = 0.4
+            p.ZIndex = 0
+            p.BorderSizePixel = 0
+            _cr(p, 4)
+            _tw(p, TweenInfo.new(math.random(25, 50) / 10, Enum.EasingStyle.Linear), {
+                Position = UDim2.new(p.Position.X.Scale + (math.random(-5, 5) / 100), 0, -0.05, 0),
+                BackgroundTransparency = 1,
+                Rotation = math.random(-180, 180)
+            }):Play()
+            game.Debris:AddItem(p, 5.5)
+        end)
+        task.wait(math.random(4, 10) / 10)
+    end
+end)
+
+-- ═══════ RIGHT CTRL TOGGLE ═══════
+UIS.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.RightControl then
+        _vis = not _vis
+        if _vis then
+            MF.Visible = true
+            Shadow.Visible = true
+            MF.BackgroundTransparency = 1
+            _tw(MF, _ti(0.3, Enum.EasingStyle.Back), {BackgroundTransparency = 0}):Play()
+            _tw(Shadow, _ti(0.3), {ImageTransparency = 0.4}):Play()
+        else
+            _tw(MF, _ti(0.25), {BackgroundTransparency = 1}):Play()
+            _tw(Shadow, _ti(0.25), {ImageTransparency = 1}):Play()
+            task.wait(0.28)
+            MF.Visible = false
+            Shadow.Visible = false
+        end
+    end
+end)
+
+-- ═══════ NOTIFICATION ═══════
+task.spawn(function()
+    task.wait(0.9)
+
+    local nf = Instance.new("Frame")
+    nf.Parent = SG
+    nf.BackgroundColor3 = Color3.fromRGB(14, 11, 24)
+    nf.Position = UDim2.new(1, 10, 1, -75)
+    nf.Size = UDim2.new(0, 260, 0, 56)
+    nf.BorderSizePixel = 0
+    _cr(nf, 10)
+    local ns = _st(nf, Color3.fromRGB(120, 40, 200), 1, 0.3)
+
+    local nt = Instance.new("TextLabel")
+    nt.Parent = nf
+    nt.BackgroundTransparency = 1
+    nt.Size = UDim2.new(1, 0, 0, 28)
+    nt.Position = UDim2.new(0, 0, 0, 4)
+    nt.Font = Enum.Font.GothamBold
+    nt.Text = "Lwoxy Script Loaded"
+    nt.TextColor3 = Color3.fromRGB(180, 140, 255)
+    nt.TextSize = 13
+
+    local nd = Instance.new("TextLabel")
+    nd.Parent = nf
+    nd.BackgroundTransparency = 1
+    nd.Size = UDim2.new(1, 0, 0, 18)
+    nd.Position = UDim2.new(0, 0, 0, 30)
+    nd.Font = Enum.Font.Gotham
+    nd.Text = "Right Ctrl to toggle UI"
+    nd.TextColor3 = Color3.fromRGB(100, 80, 160)
+    nd.TextSize = 10
+
+    _tw(nf, _ti(0.5, Enum.EasingStyle.Quart), {Position = UDim2.new(1, -275, 1, -75)}):Play()
+    task.wait(4)
+    _tw(nf, _ti(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Position = UDim2.new(1, 10, 1, -75)}):Play()
+    task.wait(0.5)
+    nf:Destroy()
+end)
